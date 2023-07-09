@@ -9,23 +9,24 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 demo_text = """
 This script trains a model on (fashion) mnist and saves said model. 
-Right now only traingin on 3's
+Right now only training on 5s
 """
 print(demo_text)
 
 ############################################################################
 fashion_mnist = False
-classes = [3]
+classes = [5]
 
-exponential_family = EinsumNetwork.BinomialArray
+# Binomial model trained on 3s, Normal model trained on 6s
 
-K = 10
+exponential_family = EinsumNetwork.NormalArray
+K = 15
 
 structure = 'poon-domingos'
 # structure = 'binary-trees'
 
 # 'poon-domingos'
-pd_num_pieces = [4]
+pd_num_pieces = [7]
 width = 28
 height = 28
 
@@ -135,17 +136,17 @@ for epoch_count in range(num_epochs):
     einet.em_update()
 
 if fashion_mnist:
-    model_dir = '../models/einet/demo_fashion_mnist_3/'
-    samples_dir = '../samples/demo_fashion_mnist_3/'
+    model_dir = '../models/einet/demo_fashion_mnist_5/'
+    samples_dir = '../samples/demo_fashion_mnist_5/'
 else:
-    model_dir = '../models/einet/demo_mnist_3/'
-    samples_dir = '../samples/demo_mnist_3/'
+    model_dir = '../models/einet/demo_mnist_5/'
+    samples_dir = '../samples/demo_mnist_5/'
 utils.mkdir_p(model_dir)
 utils.mkdir_p(samples_dir)
 
 
 # save model
-graph_file = os.path.join(model_dir, "einet.pc")
+#graph_file = os.path.join(model_dir, "einet.pc")
 #Graph.write_gpickle(graph, graph_file)
 #print("Saved PC graph to {}".format(graph_file))
 model_file = os.path.join(model_dir, "einet.mdl")

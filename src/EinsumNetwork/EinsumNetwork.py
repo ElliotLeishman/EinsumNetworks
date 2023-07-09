@@ -250,6 +250,19 @@ class EinsumNetwork(torch.nn.Module):
     def em_update(self):
         for l in self.einet_layers:
             l.em_update()
+                
+    #########################################################################################################
+
+    def expectation(self,x):
+        """Evaluate the expectation of a pixel."""
+
+        input_layer = self.einet_layers[0]
+        input_layer.expectation(x=x)
+        for einsum_layer in self.einet_layers[1:]:
+            einsum_layer()
+        return self.einet_layers[-1].prob[:, :, 0]
+
+
 
 
 def log_likelihoods(outputs, labels=None):
@@ -295,3 +308,4 @@ def eval_loglikelihood_batched(einet, x, labels=None, batch_size=100):
             ll_sample = log_likelihoods(outputs, batch_labels)
             ll_total += ll_sample.sum().item()
         return ll_total
+    

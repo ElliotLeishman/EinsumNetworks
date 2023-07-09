@@ -87,6 +87,12 @@ class FactorizedLeafLayer(Layer):
                  Will be of shape (batch_size, num_dist, len(self.nodes))
                  Note: num_dist is K in the paper, len(self.nodes) is the number of PC leaves
         """
+
+    ############################################################
+        #output, theta = self.ef_array(x)
+        #self.prob = torch.einsum('bxir,xro->bio', output, self.scope_tensor)
+        print(self.ef_array(x).shape)
+    ################################################
         self.prob = torch.einsum('bxir,xro->bio', self.ef_array(x), self.scope_tensor)
 
     def backtrack(self, dist_idx, node_idx, mode='sample', **kwargs):
@@ -157,3 +163,10 @@ class FactorizedLeafLayer(Layer):
     def get_marginalization_idx(self):
         """Get indicices of marginalized variables."""
         return self.ef_array.get_marginalization_idx()
+
+    ##################################################################################
+    
+    def expectation(self, x):
+        '''Same as forward but I think I need to edit self.ef_array(x)'''
+
+        self.prob = torch.einsum('bxir,xro->bio', x, self.scope_tensor)

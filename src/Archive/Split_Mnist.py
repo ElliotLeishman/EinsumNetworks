@@ -15,7 +15,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 fashion_mnist = False
 
 # Choose the classes we want
-classes = [3]
+classes = [7]
 
 # Get data
 if fashion_mnist:
@@ -42,8 +42,8 @@ if fashion_mnist:
     part_1 = f'../split_datasets/fashion3/part_1/1'
     part_2 = f'../split_datasets/fashion3/part_2/1'
 else:
-    part_1 = f'../split_datasets/mnist3/part_1/1'
-    part_2 = f'../split_datasets/mnist3/part_2/1'
+    part_1 = f'../split_datasets/mnist7/part_1/1'
+    part_2 = f'../split_datasets/mnist7/part_2/1'
 
 utils.mkdir_p(part_1)
 utils.mkdir_p(part_2)

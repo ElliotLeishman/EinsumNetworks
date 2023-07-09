@@ -31,4 +31,3 @@ samples = einet.sample(num_samples=num_sam).cpu()
 
 for i in range(num_sam):
     utils.save_image_stack(torch.reshape(samples[i],(1,28,28)), 1, 1, os.path.join(samples_dir, f'image_{i}.png'), margin_gray_val=0.)
-
