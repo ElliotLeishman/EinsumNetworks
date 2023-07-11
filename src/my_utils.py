@@ -294,9 +294,9 @@ def train_model(save_dir, classes, exp_family, K, pd_pieces, fashion_mnist = Fal
 
 # train_model('../models/einet/demo_mnist_test/', [7], EinsumNetwork.NormalArray, K = 5, pd_pieces = [4], fashion_mnist = False, num_epochs = 1, batch_size = 10, online_em_frequency = 1, online_em_stepsize = 0.05)
 
-def image_expectation(num_pixels):
+def image_expectation(num_pixels, model_file):
 
-    model_file = os.path.join('../models/einet/demo_mnist_5/', "einet.mdl")
+    #model_file = os.path.join('../models/einet/demo_mnist_5/', "einet.mdl")
     model = torch.load(model_file)
     dist_layer = model.einet_layers[0]
 
