@@ -115,7 +115,7 @@ def sampling(num_sam, model_dir, sample_dir = None, save = False):
 
     return samples
 
-sampling(10, '../models/einet/demo_mnist_3/', '../samples/demo_mnist_3/1/', True)
+#sampling(10, '../models/einet/demo_mnist_3/', '../samples/demo_mnist_3/1/', True)
 
 def split_mnist(classes, fashion = False, save = False, save_dir = None):
 
@@ -294,4 +294,30 @@ def train_model(save_dir, classes, exp_family, K, pd_pieces, fashion_mnist = Fal
 
 # train_model('../models/einet/demo_mnist_test/', [7], EinsumNetwork.NormalArray, K = 5, pd_pieces = [4], fashion_mnist = False, num_epochs = 1, batch_size = 10, online_em_frequency = 1, online_em_stepsize = 0.05)
 
+def image_expectation(num_pixels):
 
+    model_file = os.path.join('../models/einet/demo_mnist_5/', "einet.mdl")
+    model = torch.load(model_file)
+    dist_layer = model.einet_layers[0]
+
+    phi = dist_layer.ef_array.params.unsqueeze(0)
+    
+    # If Gaussian
+    phi = dist_layer.ef_array.params#.squeeze()
+    phi = phi[:,:,:,0]
+    print(phi.shape)
+
+    expectations = torch.zeros(784)
+
+
+    for pix in range(num_pixels):
+
+        phi2 = torch.zeros((1,784,15,1))
+
+        # phi2[:,pix,:,:] = phi[pix,:]
+
+        phi2[:,pix,:,:] = phi[pix,:]
+        expectations[pix] = model.expectation(phi2)
+        print(pix)
+        
+    return expectations.detach()
