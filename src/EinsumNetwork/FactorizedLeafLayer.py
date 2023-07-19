@@ -91,7 +91,7 @@ class FactorizedLeafLayer(Layer):
     ############################################################
         #output, theta = self.ef_array(x)
         #self.prob = torch.einsum('bxir,xro->bio', output, self.scope_tensor)
-        print(self.ef_array(x).shape)
+        # print(self.ef_array(x).shape)
     ################################################
         self.prob = torch.einsum('bxir,xro->bio', self.ef_array(x), self.scope_tensor)
 

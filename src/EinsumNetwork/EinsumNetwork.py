@@ -264,12 +264,12 @@ class EinsumNetwork(torch.nn.Module):
 
 
     def denoising_expectation(self, means):
+
         input_layer = self.einet_layers[0]
-        
         input_layer.expectation(x = means)
         for einsum_layer in self.einet_layers[1:]:
             einsum_layer()
-
+        return self.einet_layers[-1].prob[:, :, 0]
 
 
 
