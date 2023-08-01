@@ -12,6 +12,7 @@ import utils
 import datasets
 from EinsumNetwork import Graph, EinsumNetwork
 import time
+import my_utils
 
 
 def image_expectation(model, num_pixels, batch_size, K = 15, gaussian = True, means = None, save = False, save_dir = None):
@@ -46,7 +47,7 @@ def image_expectation(model, num_pixels, batch_size, K = 15, gaussian = True, me
         expectations[batch_no*batch_size:(batch_no + 1)*batch_size] = model.expectation(x).detach().squeeze()
 
     if save and save_dir is not None:
-        utils.mkdir_p(save_dir)
+        #utils.mkdir_p(save_dir)
         utils.save_image_stack(torch.reshape(expectations,(1,28,28)),\
          1, 1, filename = save_dir, margin_gray_val=0.)
         print(f'Images saved to {save_dir}')
@@ -57,6 +58,7 @@ def image_expectation(model, num_pixels, batch_size, K = 15, gaussian = True, me
 
 #print(image_expectation('../models/einet/demo_mnist_5/einet.mdl', 784, 28, 15, True))
 #print(image_expectation('../models/einet/demo_mnist_3/einet.mdl', 784, 28, 15, False))
+
 
 def get_variance(phi, dist_layer):
     '''Only works for NormalArray'''
@@ -103,6 +105,7 @@ def denoising_expectation(model_file, noisy_image, epsilon, num_pixels, batch_si
     # Format noisy image
     y = torch.reshape(noisy_image,(1,784)).squeeze()
     y = torch.transpose(y.repeat(K,1),0,1).unsqueeze(2)
+    print(y.shape)
 
     # Distibution parameters
     phi = dist_layer.ef_array.params
@@ -112,6 +115,6 @@ def denoising_expectation(model_file, noisy_image, epsilon, num_pixels, batch_si
     
 #utils.mkdir_p('../expectation/demo_mnist/1/')
 
-#for i in range(10):
-#    noisy_image = load_images('../blur2/', True)[i,:,:,:]
+#for i in range(20):
+#    noisy_image = my_utils.load_images('../blur2/', True)[i,:,:,:]
 #    denoising_expectation('../models/einet/demo_mnist/einet.mdl',noisy_image, 0.01, 784, 28, K = 10, save = True, save_dir = f'../expectation/demo_mnist/1/denoised_{i}.png')

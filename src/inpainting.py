@@ -19,7 +19,7 @@ def create_inpainting_matrix(num_pixels, prop):
 
 
 
-def inpainting(image, prop, noise = True, sigma = 0.05, save = False, save_dir = None):
+def inpainting(image, prop, noise = True, sigma = 0.01, save = False, save_dir = None):
 
     shape = image.shape
     d = shape[2] * shape[3]
@@ -45,7 +45,7 @@ def inpainting(image, prop, noise = True, sigma = 0.05, save = False, save_dir =
 
     return image, A
 
-#inpainting(image, 0.5, save = True, save_dir = '../inpainting/1')
+inpainting(image, 0.5, save = True, save_dir = '../inpainting/1')
 
 
 def inverse_inpainting(model_file, noisy_image, epsilon, A, num_pixels, batch_size, K = 15, gaussian = True, save = False, save_dir = None):
@@ -62,6 +62,6 @@ def inverse_inpainting(model_file, noisy_image, epsilon, A, num_pixels, batch_si
     phi = dist_layer.ef_array.params
     mean, var = gaussian_product(phi, y, epsilon, dist_layer)
 
-noisy_image = my_utils.load_images('../inpainting/')[0:,]
+#noisy_image = my_utils.load_images('../inpainting/')[0:,]
 
-my_utils.denoising_expectation('../models/einet/demo_mnist_5/',noisy_image, 0.05, 784, 28, K = 10, save = True, save_dir = f'../depainted/5/')
+#my_utils.denoising_expectation('../models/einet/demo_mnist_5/',noisy_image, 0.05, 784, 28, K = 10, save = True, save_dir = f'../depainted/5/')

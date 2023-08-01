@@ -38,59 +38,6 @@ def load_images(dir, grey_scale = False):
 
     return images
 
-#test = load_images('../samples/demo_mnist_3/')
-#print(type(test), test.size(), test[999])
-
-def FID(dir_real, dir_gen, features = 2048):
-
-    fid = FrechetInceptionDistance(feature=features)
-
-    # Load images as tensors
-    imgs_true = load_images(dir_real).type(torch.uint8)[:127]
-    imgs_false = load_images(dir_gen).type(torch.uint8)[:127]
-
-    print('Images have been loaded in.')
-
-    # Calculate and print the FID distance
-    fid.update(imgs_true, real=True)
-    print('FID object updated with true images.')
-    fid.update(imgs_false, real=False)
-
-    return fid.compute()
-
-#print(FID('../split_datasets/mnist3/part1', '../samples/demo_mnist_3/'))
-#print(FID('../split_datasets/mnist7/part_1', '../split_datasets/mnist3/part_2'))
-
-
-def gaussian_noise(img_dir, gs = True, sigma = 0.05, save = False, save_dir = None):
-    
-    # Load the images and store them as a tensor
-    x = load_images(img_dir, grey_scale = gs)
-
-    shape = x.size() # Save the shape of image tensors for later
-    x = torch.flatten(x, start_dim = 1)
-    d = x.size()[1]
-
-    # Noise
-    means = np.zeros(d)
-    cov = sigma * np.eye(d)
-
-    w = np.random.multivariate_normal(means, cov, shape[0])
-    y = x + w 
-
-    if save and save_dir is not None:
-        utils.mkdir_p(save_dir)
-        for i in range(len(y)):
-            utils.save_image_stack(torch.reshape(y[i],(1,shape[2],shape[2])), 1, 1, os.path.join(save_dir, f'noise_image_{i}.png'), margin_gray_val=0.)
-        print(f'Images saved to {save_dir}')
-    elif save:
-        print('Need name of directory to save images to...')
-
-    return y
-
-#gaussian_noise('../blur/', save = True, save_dir = '../blur2/2')
-
-
 def sampling(num_sam, model_dir, sample_dir = None, save = False):
 
     # Load the model
@@ -115,8 +62,6 @@ def sampling(num_sam, model_dir, sample_dir = None, save = False):
         print('Need name of directory to save images to...')
 
     return samples
-
-# sampling(250, '../models/einet/demo_mnist/', '../samples/demo_mnist/1/', True)
 
 def split_mnist(classes, fashion = False, save = False, save_dir = None):
 
@@ -163,7 +108,6 @@ def split_mnist(classes, fashion = False, save = False, save_dir = None):
 
     return train_x1, train_x2
 
-#split_mnist([5], save = True, save_dir = '../split_datasets/mnist_5')
 
 def train_model(save_dir, classes, exp_family, K, pd_pieces, fashion_mnist = False, num_epochs = 1, batch_size = 10, online_em_frequency = 1, online_em_stepsize = 0.05):
 
