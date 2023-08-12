@@ -46,7 +46,7 @@ def sampling(num_sam, model_dir, sample_dir = None, save = False):
 
     # Print information of the model for user
     print("Loaded model from {}".format(model_file))
-    print(einet)
+    #print(einet)
 
     # Sample from the model
     samples = einet.sample(num_samples = num_sam).cpu()
@@ -62,6 +62,9 @@ def sampling(num_sam, model_dir, sample_dir = None, save = False):
         print('Need name of directory to save images to...')
 
     return samples
+
+# sampling(100, '../models/einet/demo_mnist/', '../samples/test', True)
+
 
 def split_mnist(classes, fashion = False, save = False, save_dir = None):
 

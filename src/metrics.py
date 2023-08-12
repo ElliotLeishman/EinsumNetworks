@@ -36,3 +36,15 @@ def MSE(clean, noisy):
 
 def PSNR(clean,noisy):
     return -10 * torch.log10(MSE(clean, noisy))
+
+
+def FID_function(true_im, false_im, batch, features):
+
+    FID_values = []
+
+    for i in range(true_im.shape[0]//batch):
+        FID_values.append(FID(true_im[i*batch:(i+1)*batch,:], false_im[i*batch:(i+1)*batch,:], features = features))
+
+    print(FID_values)
+
+    return FID_values

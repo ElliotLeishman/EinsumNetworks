@@ -171,4 +171,9 @@ class FactorizedLeafLayer(Layer):
 
         self.prob = torch.einsum('bxir,xro->bio', x, self.scope_tensor)
 
+    def tensorised_expectation(self, x):
+        '''Same as forward but I think I need to edit self.ef_array(x)'''
+
+        self.prob = torch.einsum('nbxir,xro->nbio', x, self.scope_tensor)
+
         

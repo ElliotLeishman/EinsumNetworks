@@ -1,4 +1,4 @@
-# Should get rid of these eventually
+# Contains the functions for Inverse problems
 import numpy as np
 import os
 import torch
@@ -37,7 +37,7 @@ def image_expectation(model, num_pixels, batch_size, K = 15, gaussian = True, me
     expectations = torch.zeros(784)
 
     for batch_no in range(num_pixels // batch_size):
-        print(f'Batch {batch_no}')
+        #print(f'Batch {batch_no}')
         x = torch.zeros((batch_size, num_pixels, K, 1))
 
         for idx in range(batch_size):
@@ -50,7 +50,7 @@ def image_expectation(model, num_pixels, batch_size, K = 15, gaussian = True, me
         #utils.mkdir_p(save_dir)
         utils.save_image_stack(torch.reshape(expectations,(1,28,28)),\
          1, 1, filename = save_dir, margin_gray_val=0.)
-        print(f'Images saved to {save_dir}')
+        #print(f'Images saved to {save_dir}')
     elif save:
         print('Need name of directory to save images to...')
 
@@ -105,7 +105,7 @@ def denoising_expectation(model_file, noisy_image, epsilon, num_pixels, batch_si
     # Format noisy image
     y = torch.reshape(noisy_image,(1,784)).squeeze()
     y = torch.transpose(y.repeat(K,1),0,1).unsqueeze(2)
-    print(y.shape)
+    #print(y.shape)
 
     # Distibution parameters
     phi = dist_layer.ef_array.params
@@ -113,8 +113,43 @@ def denoising_expectation(model_file, noisy_image, epsilon, num_pixels, batch_si
 
     return image_expectation(einet, num_pixels, batch_size, K = K, gaussian = gaussian, means = mean, save = save, save_dir = save_dir)
     
-#utils.mkdir_p('../expectation/demo_mnist/1/')
 
-#for i in range(20):
-#    noisy_image = my_utils.load_images('../blur2/', True)[i,:,:,:]
-#    denoising_expectation('../models/einet/demo_mnist/einet.mdl',noisy_image, 0.01, 784, 28, K = 10, save = True, save_dir = f'../expectation/demo_mnist/1/denoised_{i}.png')
+def depainting(model_file, A, noisy_image, K=15, sigma = 0.01, img_name = 0, save_dir = None):
+    # sigma is actually variance so should be sigma^2
+    noisy_image = torch.reshape(noisy_image, (1, 784))
+
+    # Format noisy image
+    y = torch.reshape(noisy_image,(1,784)).squeeze()
+    y = torch.transpose(y.repeat(K,1),0,1).unsqueeze(2)
+
+    # Prior means
+    einet = torch.load(model_file)
+    dist_layer = einet.einet_layers[0]
+    phi = dist_layer.ef_array.params
+    prior_means = phi[:,:,:,0]
+    comb_means, var = gaussian_product(phi, y, sigma, dist_layer)
+    #print(post_means.shape)
+
+    # Initialise the mean vector and the multiplier
+    means = torch.zeros(784,K,1)
+    multiplier = torch.ones(784)
+
+    # Reshape A
+    A = torch.reshape(A,(1,784))
+
+    for i in range(A.shape[1]):
+        if A[:,i] == 1:
+            #x = torch.zeros(1,784, 15, 1)
+            means[i, :] = comb_means[i]
+
+        elif A[:,i] == 0:
+            #x = torch.zeros(1,784, 15, 1)
+            means[i, :] = prior_means[i]
+
+            # Deterministic part - multiplier
+            multiplier[i]= torch.exp(-0.5 * noisy_image[:,i]**2 / sigma)
+
+        else:
+            raise
+
+    return multiplier * image_expectation(einet, 784, 28, K=K, means = means, save = True, save_dir = os.path.join(save_dir,f'{img_name}.png'))

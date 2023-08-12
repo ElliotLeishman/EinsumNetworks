@@ -65,3 +65,5 @@ def inverse_inpainting(model_file, noisy_image, epsilon, A, num_pixels, batch_si
 #noisy_image = my_utils.load_images('../inpainting/')[0:,]
 
 #my_utils.denoising_expectation('../models/einet/demo_mnist_5/',noisy_image, 0.05, 784, 28, K = 10, save = True, save_dir = f'../depainted/5/')
+
+

@@ -41,7 +41,6 @@ def depainting(A, noisy_image, sigma = 0.01, img_no = 0):
     expectations = torch.zeros(784)
 
 
-
     for i in range(A.shape[1]):
         if A[:,i] == 1:
 
@@ -80,7 +79,7 @@ def depainting(A, noisy_image, sigma = 0.01, img_no = 0):
 #     depainting(A, noisy_image, img_no = i)
 
 
-def depainting_2(A, noisy_image, sigma = 0.01, img_no = 0):
+def depainting_2(A, noisy_image, sigma = 0.01, img_no = 0, save_dir = None):
     # sigma is actually variance so should be sigma^2
     noisy_image = torch.reshape(noisy_image, (1, 784))
 
