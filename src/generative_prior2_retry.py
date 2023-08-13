@@ -19,7 +19,7 @@ values = []
 
 
 # want to test the effect of number of pd_pieces on time taken and sample quality
-for classes in [[7], None]:
+for classes in [None]:
 
     if classes == None:
         i = 'whole'
@@ -53,7 +53,7 @@ for classes in [[7], None]:
 
     true = my_utils.load_images(f'../experiments/prior/mnist_{i}/test/', grey_scale = False).type(torch.uint8)[:num_sam,:]
 
-    for pd in [2,4,7]:
+    for pd in [7]:
     
         starting = time.time()
         # Train up the model
