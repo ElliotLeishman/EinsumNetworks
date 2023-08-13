@@ -43,7 +43,7 @@ def noise_denoise(classes_list, sig2s):
             test_x = test_x[np.any(np.stack([test_labels == c for c in classes], 1), 1), :]
 
         # Make directory
-        utils.mkdir_p(f'../experiments/prior/mnist_{i}/train/1/')
+        utils.mkdir_p(f'../experiments/prior/mnist_{i}/train/1')
         utils.mkdir_p(f'../experiments/prior/mnist_{i}/test/1/')
 
         # Save the split up MNIST
