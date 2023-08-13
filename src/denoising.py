@@ -11,11 +11,9 @@ import time as time
 # Code that will get me results for multiple denosing instances
 # Should store average psnr for both the noisy and denoisy images
 
-#sig2s = [0.0001,0.0005,0.001,0.005,0.01,0.05,0.1]
-sig2s = [0.0001]
-
+sig2s = [0.0001,0.0005,0.001,0.005,0.01,0.05,0.1]
 classes_list = [[7]]
-num_sam = 5
+num_sam = 1000
 
 # Load the models
 def noise_denoise(classes_list, sig2s):
