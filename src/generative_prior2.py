@@ -77,7 +77,7 @@ for classes in [[7], None]:
         gen = my_utils.load_images(f'../experiments/prior/samples/{i}_pd_{pd}/', grey_scale = False).type(torch.uint8)[:num_sam,:]
         values.append(f'The FID values for {i}_pd_{pd} are:{metrics.FID_function(true,gen,100,2048)}')
 
-    train = my_utils.load_images(f'../experiments/prior/mnist_{classes}/train/', grey_scale = False).type(torch.uint8)[:num_sam,:]
+    train = my_utils.load_images(f'../experiments/prior/mnist_{i}/train/', grey_scale = False).type(torch.uint8)[:num_sam,:]
     values.append(f'The FID values for {i} train vs. test are:{metrics.FID_function(true,train,100,2048)}')
 
 
