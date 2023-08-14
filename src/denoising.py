@@ -10,22 +10,34 @@ import time as time
 
 # Code that will get me results for multiple denosing instances
 # Should store average psnr for both the noisy and denoisy images
+# Using k = 15, pd_pieces = 7
 
 sig2s = [0.0001,0.0005,0.001,0.005,0.01,0.05,0.1]
-classes_list = [None]
+classes_list = [[7], None]
 num_sam = 1000
+psnr = PeakSignalNoiseRatio(data_range = 1, reduction = 'none', dim = [1,2,3])
+
 
 # Load the models
 def noise_denoise(classes_list, sig2s):
 
     for classes in classes_list:
         
-        print(classes)
         if classes == None:
             i = 'whole'
         else:
             i = classes[0]
         print(i)
+
+        # Intialise the lists to store the summary statistics
+        means = []
+        sds = []
+        means2 = []
+        sds2 = []
+
+        # Load the true images
+        true_images = my_utils.load_images(f'../experiments/prior/mnist_{i}/test/',grey_scale=True)[:num_sam,:]
+        true_images = torch.reshape(true_images, (-1,1,28,28))
 
         # Split MNIST dataset up
         ####################################################
@@ -51,78 +63,49 @@ def noise_denoise(classes_list, sig2s):
         for j in range(test_x.shape[0]):
             utils.save_image_stack(torch.reshape(torch.from_numpy(test_x[j,:]),(1,28,28)), 1, 1, filename = f'../experiments/prior/mnist_{i}/test/1/image_{j}.png', margin_gray_val=0.)
 
-
-
-        # Using k = 15, pd_pieces = 7
-        # model = torch.load(f'../experiments/prior/models/{i}_pd_7/einet.mdl')
-
         # Load the relevant mnist datasets
         test_images = my_utils.load_images(f'../experiments/prior/mnist_{i}/test/')
 
         for sig2 in sig2s:
-            # Create the noisy images
-            noisy_images = forward_models.gaussian_noise(f'../experiments/prior/mnist_{i}/test/', sigma = sig2, save = True, save_dir = f'../experiments/denoising2/noisy/mnist_{i}/sigma_{sig2}/1')
 
-            # Create save directory
-            denoised = f'../experiments/denoising2/denoised/mnist_{i}/sigma_{sig2}/1'
-            utils.mkdir_p(denoised)
+            # Create the noisy images
+            noisy_images = forward_models.gaussian_noise(f'../experiments/prior/mnist_{i}/test/', sigma = sig2)
+
+            print(noisy_images.shape)
+            noisy_images = torch.reshape(noisy_images, (-1,1,28,28))
 
             # Remove the noise
+            denoised_images = torch.zeros((num_sam,784))
             for j in range(num_sam):
-                denoisy_images = expectation.denoising_expectation(f'../experiments/prior/models/{i}_pd_7/einet.mdl', noisy_images[j], sig2, 784, 28, K = 15, gaussian = True, save = False, save_dir = None)
-        
-        
-                utils.save_image_stack(torch.reshape(denoisy_images,(1,28,28)), 1, 1, os.path.join(denoised, f'image_{j}.png'), margin=5, margin_gray_val=1., frame=0, frame_gray_val=0.0)
+                denoised_images[j,:] = expectation.denoising_expectation(f'../experiments/prior/models/{i}_pd_7/einet.mdl', noisy_images[j]-0.5, sig2, 784, 28, K = 15, gaussian = True)
 
-def summary_statistics(classes_list, sig2s):
+            denoised_images = torch.reshape(denoised_images, (-1,1,28,28))
 
-    for classes in classes_list:
+            # Update Summary statistics
+            psnr1 = psnr(denoised_images[:num_sam,:] + 0.5,true_images[:num_sam,:])
+            psnr2 = psnr(noisy_images[:num_sam,:],true_images[:num_sam,:])
 
-        if classes == None:
-            i = 'whole'
-        else:
-            i = classes[0]
-        print(i)
+            means.append(f'sig2 = {sig2}: {torch.mean(psnr1):.2f}')
+            sds.append(f'sig2 = {sig2}: {torch.std(psnr1):.2f}')
+            means2.append(f'sig2 = {sig2}: {torch.mean(psnr2):.2f}')
+            sds2.append(f'sig2 = {sig2}: {torch.std(psnr2):.2f}')
+
+            # Create the directories to save the images
+            utils.mkdir_p(f'../experiments/denoising2/noisy/')
+            utils.mkdir_p(f'../experiments/denoising2/denoised/')
+
+            # Save the noisy and denoised images as raw tensors
+            torch.save(noisy_images[:num_sam,:], f'../experiments/denoising2/noisy/mnist_{i}_sigma_{sig2}.pt')
+            torch.save(denoised_images[:num_sam,:], f'../experiments/denoising2/denoised/mnist_{i}_sigma_{sig2}.pt')
 
 
-        # Intialise the lists to store the summary statistics
-        means = []
-        sds = []
-        means2 = []
-        sds2 = []
-
-        # Load the true images
-        true_images = my_utils.load_images(f'../experiments/prior/mnist_{i}/test/',grey_scale=True)[:num_sam,:]
-
-        for sig2 in sig2s:
-
-            # Load the denoised images
-            denoised_images = my_utils.load_images(f'../experiments/denoising2/denoised/mnist_{i}/sigma_{sig2}', grey_scale=True)
-            psnr = PeakSignalNoiseRatio(data_range = 1, reduction = 'none', dim = [1,2,3])
-            psnrs = psnr(denoised_images,true_images)
-
-            # Update the summary statistics
-            means.append(torch.mean(psnrs))
-            sds.append(torch.std(psnrs))
-
-            # True images
-            noisy_images = my_utils.load_images(f'../experiments/denoising2/noisy/mnist_{i}/sigma_{sig2}',grey_scale=True)[:num_sam,:]
-
-            psnr = PeakSignalNoiseRatio(data_range = 1, reduction = 'none', dim = [1,2,3])
-            psnrs = psnr(noisy_images,true_images)
-
-            # Update the summary statistics
-            means2.append(torch.mean(psnrs))
-            sds2.append(torch.std(psnrs))    
+        print(f'Summary statistics for PSNR Values, (denoised & true) (mnist_{i}) means: {means}, sds: {sds}')
+        print(f'Summary statistics for PSNR Values, (noisy & true) (mnist_{i}) means: {means2}, sds: {sds2}')
 
 
 
-
-        print(f'Summary statistics for PSNR Values, (denoised & true) means: {means}, sts: {sds}')
-        print(f'Summary statistics for PSNR Values, (noisy & true) means: {means2}, sts: {sds2}')
 
 noise_denoise(classes_list, sig2s)
-summary_statistics(classes_list, sig2s)
 
 
 
