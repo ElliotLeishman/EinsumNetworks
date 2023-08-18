@@ -33,7 +33,7 @@ classes_list = [[7], None]
 true_image = my_utils.load_images('../experiments/denoising/Figure/True_images/',grey_scale=True)
 
 # Parameters and initialisations
-maxit = 10000
+maxit = 25000
 burnin = np.int64(maxit*0.05)
 n_samples = np.int64(5000)
 psnr_values = []
@@ -84,7 +84,6 @@ for sig2 in sig2s:
 
                 # collect quality measurements
                 current_mean = post_meanvar.get_mean()
-                psnr_values.append(psnr(current_mean,true_image))
 
                 if j % 250 == 0:
                     print(j,psnr(current_mean.detach(),true_image))
@@ -95,7 +94,6 @@ for sig2 in sig2s:
 
         posterior_means.append(post_meanvar.get_mean().detach())
         final_psnrs.append(f'mnist_{i}, sig2 = {sig2}: {psnr(current_mean.detach(),true_image):.2f}')
-        psnrs.append(f'mnist_{i}, sig2 = {sig2}: {psnr_values:.2f}')
 
     print(final_psnrs)
 
