@@ -76,8 +76,6 @@ for sig2 in sig2s:
                 # Initialise recording of sample summary statistics after burnin period
                 post_meanvar = ULA.welford(X)
                 absfouriercoeff = ULA.welford(torch.fft.fft2(X).abs())
-                if j % 250 == 0:
-                    print(j,psnr(current_mean.detach(),true_image))
 
             elif j > burnin:
                 # update the sample summary statistics
