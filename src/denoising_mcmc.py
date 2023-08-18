@@ -33,9 +33,9 @@ classes_list = [[7], None]
 true_image = my_utils.load_images('../experiments/denoising/Figure/True_images/',grey_scale=True)
 
 # Parameters and initialisations
-maxit = 25000
+maxit = 15000
 burnin = np.int64(maxit*0.05)
-n_samples = np.int64(1000)
+n_samples = np.int64(5000)
 psnr_values = []
 posterior_means = []
 psnrs = []
