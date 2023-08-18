@@ -33,7 +33,7 @@ classes_list = [[7], None]
 true_image = my_utils.load_images('../experiments/denoising/Figure/True_images/',grey_scale=True)
 
 # Parameters and initialisations
-maxit = 25000
+maxit = 15000
 burnin = np.int64(maxit*0.05)
 n_samples = np.int64(5000)
 psnr_values = []
@@ -94,7 +94,7 @@ for sig2 in sig2s:
 
         posterior_means.append(post_meanvar.get_mean().detach())
         final_psnrs.append(f'mnist_{i}, sig2 = {sig2}: {psnr(current_mean.detach(),true_image):.2f}')
-
+        torch.save(current_mean.detach(), f'../experiments/denoising2/PC_MCMC/{i}_{sig2}.pt')
     print(final_psnrs)
 
 
