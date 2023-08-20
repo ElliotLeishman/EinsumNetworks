@@ -11,7 +11,7 @@ from torchmetrics.image import PeakSignalNoiseRatio
 num_sam = 1000
 batch_size = 100
 
-for classes in [None]:
+for classes in [[7]]:
 
     if classes == None:
         i = 'whole'
