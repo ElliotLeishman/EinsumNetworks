@@ -200,7 +200,7 @@ def depainting2(model, A, noisy_image, K=15, sigma = 0.01, img_name = 0, save_di
     
 
     result = image_expectation(einet, 784, 28, K=K, means = means) + 0.5
-    print(torch.min(result), torch.max(result))
+    #print(torch.min(result), torch.max(result))
 
 
     return multiplier * result
