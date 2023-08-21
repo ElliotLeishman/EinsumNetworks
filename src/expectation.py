@@ -114,7 +114,7 @@ def denoising_expectation(model_file, noisy_image, epsilon, num_pixels, batch_si
     return image_expectation(einet, num_pixels, batch_size, K = K, gaussian = gaussian, means = mean, save = save, save_dir = save_dir)
     
 
-def depainting(model_file, A, noisy_image, K=15, sigma = 0.01, img_name = 0, save_dir = None):
+def depainting(model, A, noisy_image, K=15, sigma = 0.01, img_name = 0, save_dir = None):
     # sigma is actually variance so should be sigma^2
     noisy_image = torch.reshape(noisy_image, (1, 784))
 
@@ -123,7 +123,7 @@ def depainting(model_file, A, noisy_image, K=15, sigma = 0.01, img_name = 0, sav
     y = torch.transpose(y.repeat(K,1),0,1).unsqueeze(2)
 
     # Prior means
-    einet = torch.load(model_file)
+    einet = model
     dist_layer = einet.einet_layers[0]
     phi = dist_layer.ef_array.params
     prior_means = phi[:,:,:,0]
@@ -147,9 +147,11 @@ def depainting(model_file, A, noisy_image, K=15, sigma = 0.01, img_name = 0, sav
             means[i, :] = prior_means[i]
 
             # Deterministic part - multiplier
-            multiplier[i]= torch.exp(-0.5 * noisy_image[:,i]**2 / sigma)
+            #multiplier[i]= torch.exp(-0.5 * (noisy_image[:,i]+0.5)**2 / sigma)
 
         else:
             raise
 
-    return multiplier * image_expectation(einet, 784, 28, K=K, means = means, save = True, save_dir = os.path.join(save_dir,f'{img_name}.png'))
+    result = image_expectation(einet, 784, 28, K=K, means = means)
+
+    return multiplier * result
