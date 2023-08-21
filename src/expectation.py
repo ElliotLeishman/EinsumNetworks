@@ -147,11 +147,60 @@ def depainting(model, A, noisy_image, K=15, sigma = 0.01, img_name = 0, save_dir
             means[i, :] = prior_means[i]
 
             # Deterministic part - multiplier
-            #multiplier[i]= torch.exp(-0.5 * (noisy_image[:,i]+0.5)**2 / sigma)
+            print(noisy_image[:,i])
+            multiplier[i]= torch.exp(-0.5 * (noisy_image[:,i]+0.5)**2 / sigma)
 
         else:
             raise
 
     result = image_expectation(einet, 784, 28, K=K, means = means)
+
+    return multiplier * result
+
+
+
+def depainting2(model, A, noisy_image, K=15, sigma = 0.01, img_name = 0, save_dir = None):
+    # sigma is actually variance so should be sigma^2
+    noisy_image = torch.reshape(noisy_image, (1, 784))
+
+    # Format noisy image
+    y = torch.reshape(noisy_image,(1,784)).squeeze()
+    y = torch.transpose(y.repeat(K,1),0,1).unsqueeze(2)
+
+    # Prior means
+    einet = model
+    dist_layer = einet.einet_layers[0]
+    phi = dist_layer.ef_array.params
+    prior_means = phi[:,:,:,0]
+    comb_means, var = gaussian_product(phi, y-0.5, sigma, dist_layer)
+    #print(post_means.shape)
+
+    # Initialise the mean vector and the multiplier
+    means = torch.zeros(784,K,1)
+    multiplier = torch.ones(784)
+
+    # Reshape A
+    A = torch.reshape(A,(1,784))
+
+    for i in range(A.shape[1]):
+        if A[:,i] == 1:
+            #x = torch.zeros(1,784, 15, 1)
+            means[i, :] = comb_means[i]
+
+        elif A[:,i] == 0:
+            #x = torch.zeros(1,784, 15, 1)
+            means[i, :] = prior_means[i]
+
+            # Deterministic part - multiplier
+            multiplier[i]= torch.exp(-0.5 * (noisy_image[:,i])**2 / sigma)
+
+        else:
+            raise
+
+    
+
+    result = image_expectation(einet, 784, 28, K=K, means = means) + 0.5
+    print(torch.min(result), torch.max(result))
+
 
     return multiplier * result
