@@ -14,12 +14,12 @@ import time as time
 
 sig2s = [0.0001,0.0005,0.001,0.005,0.01,0.05,0.1]
 classes_list = [[7], None]
-num_sam = 1000
+num_sam = 5
 psnr = PeakSignalNoiseRatio(data_range = 1, reduction = 'none', dim = [1,2,3])
 
 # Load the A matrix
-A = torch.load('../experiments/inpainting/0.5_A_matrix.pt')
-print('Matrix A has been loaded in.')
+#A = torch.load('../experiments/inpainting/0.5_A_matrix.pt')
+#print('Matrix A has been loaded in.')
 
 # Load the models
 def inpaint_depaint(classes_list, sig2s):
