@@ -34,9 +34,9 @@ classes_list = [[7], None]
 true_image = my_utils.load_images('../experiments/denoising/Figure/True_images/',grey_scale=True)
 
 # Parameters and initialisations
-maxit = 5000
+maxit = 10000
 burnin = np.int64(maxit*0.05)
-n_samples = np.int64(1000)
+n_samples = np.int64(5000)
 psnr_values = []
 posterior_means = []
 psnrs = []
@@ -104,7 +104,7 @@ for idx,sig2 in enumerate(sig2s):
         print(f'Time taken was {time.time() - start}')
 
         posterior_means.append(post_meanvar.get_mean().detach())
-        psnrs.append(f'mnist_{i}, sig2 = {sig2}: {psnr(current_mean.detach() + 0.5,true_image):.2f}')
+        psnrs.append(f'mnist_{i}, sig2 = {sig2}: {psnr(current_mean.detach(),true_image):.2f}')
 
     print(psnrs)
 
