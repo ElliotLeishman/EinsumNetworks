@@ -22,7 +22,7 @@ def loglikelihood_gradient(x,y,A,AT,sig2):
     return -torch.reshape(AT@(A@torch.reshape(x,(784,1))-torch.reshape(y, (784,1))),(28,28))/sig2
 
 def MCMC_kernel(x,x2, y, A, AT, sig2, prior, h):
-    return x + h * loglikelihood_gradient(x,y,A,AT,sig2) + h * (logPC_gradient(prior,x2)+0.5) + math.sqrt(2*h) * torch.randn_like(x)
+    return x - h * loglikelihood_gradient(x,y,A,AT,sig2) + h * (logPC_gradient(prior,x2)+0.5) + math.sqrt(2*h) * torch.randn_like(x)
 
 
 psnr = PeakSignalNoiseRatio(data_range = 1)
